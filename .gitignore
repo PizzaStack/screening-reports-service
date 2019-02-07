@@ -155,3 +155,4 @@ buildNumber.properties
 .mvn/
 mvnw
 mvnw.cmd
+*.md.html
