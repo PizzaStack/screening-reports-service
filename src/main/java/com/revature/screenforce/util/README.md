@@ -6,42 +6,34 @@
 
 #### getWeekToDate
 
-##### public java.time.LocalDate getWeekToDate(java.time.LocalDate from, int numWeeks)
+##### public java.time.LocalDate getWeekToDate(int numWeeks)
 
 Parameters:
-
-*from* - The end date of the period for reporting aggregate metrics
 
 *numWeeks* - The number of weeks
 
 *Returns*:
-The start date
+The start date in UTC numWeeks prior from now
 
 
 #### getMonthToDate
 
-##### public java.time.LocalDate getMonthToDate(java.time.LocalDate from, int numMonths)
+##### public java.time.LocalDate getMonthToDate(int numMonths)
 
 Parameters:
-
-*from* - The end date of the period for reporting aggregate metrics
 
 *numMonths* - The number of months
 
 *Returns*:
-The start date
+The start date in UTC numMonths prior from now
 
 
 #### getYearToDate
 
-##### public java.time.LocalDate getYearToDate(java.time.LocalDate from)
-
-Parameters:
-
-*from* - The end date of the period for reporting aggregate metrics
+##### public java.time.LocalDate getYearToDate()
 
 *Returns*:
-The start date one year prior to from
+return The start date in UTC one year prior from now
 
 
 **Useful Links** 
