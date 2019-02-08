@@ -17,6 +17,9 @@ public class Screener {
 	
 	@Column(name="NAME")
 	private String name;
+	
+	@Column(name="EMAIL")
+	private String email;
 
 	public int getScreenerId() {
 		return screenerId;
@@ -34,16 +37,27 @@ public class Screener {
 		this.name = name;
 	}
 
-	public Screener(int screenerId, String name) {
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public Screener(int screenerId, String name, String email) {
 		super();
 		this.screenerId = screenerId;
 		this.name = name;
+		this.email = email;
 	}
 
 	public Screener() {
 		super();
 		// TODO Auto-generated constructor stub
 	}
+
+	
 	
 	
 }
