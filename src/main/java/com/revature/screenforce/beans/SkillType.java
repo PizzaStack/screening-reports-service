@@ -28,9 +28,9 @@ import io.swagger.annotations.ApiModelProperty;
 @ApiModel(value = "SkillType", description = "SkillType corresponding to an overall training track, associated with a number of Buckets")
 @Entity
 @Table(name = "SKILL_TYPE")
-public class SkillType implements Serializable {
+public class SkillType /*implements Serializable*/ {
 
-	private static final long serialVersionUID = -6863562903787298483L;
+	//private static final long serialVersionUID = -6863562903787298483L;
 	
 	@ApiModelProperty(value = "Skill type id")
 	@Id
@@ -59,10 +59,12 @@ public class SkillType implements Serializable {
 	/**
 	 * getters & setters
 	 */
+	/*
 	public static long getSerialVersionUID() {
 		return serialVersionUID;
 	}
-
+	 */
+	
 	public int getSkillTypeId() {
 		return skillTypeId;
 	}
