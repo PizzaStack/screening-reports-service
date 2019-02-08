@@ -33,7 +33,7 @@ The start date in UTC numMonths prior from now
 ##### public java.time.LocalDate getYearToDate()
 
 *Returns*:
-return The start date in UTC one year prior from now
+return The start date in UTC of January 1st of the current year
 
 
 **Useful Links** 
