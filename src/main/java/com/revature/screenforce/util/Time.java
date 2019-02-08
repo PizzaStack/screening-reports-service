@@ -30,9 +30,11 @@ public class Time {
 	
 	/**
 	 * 
-	 * @return The start date in UTC one year prior from now
+	 * @return The start date in UTC of January 1st of the current year
 	 */
 	public LocalDate getYearToDate() {
-		return LocalDate.now(ZONE_ID).minusYears(1);
+		return LocalDate.of(LocalDate.now(ZONE_ID).getYear(),
+				1, 
+				1);
 	}
 }
