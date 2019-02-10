@@ -1,41 +1,40 @@
 package com.revature.screenforce.util;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
 
 /** 
  * Convenience class to select a date based on period, ie WTD, MTD, YTD 
  **/
 // http://tutorials.jenkov.com/java-date-time/localdate.html
 public class Time {
+	private final ZoneId ZONE_ID = ZoneOffset.UTC;
 	/**
 	 * 
-	 * @param from
-	 * 	The end date of the period for reporting aggregate metrics
 	 * @param numWeeks The number of weeks
-	 * @return The start date
+	 * @return The start date in UTC numWeeks prior from now
 	 */
-	public LocalDate getWeekToDate(LocalDate from, int numWeeks) {
-		return from.minusWeeks(numWeeks);
+	public LocalDate getWeekToDate(int numWeeks) {
+		return LocalDate.now(ZONE_ID).minusWeeks(numWeeks);
 	}
 	
 	/**
 	 * 
-	 * @param from
-	 * 	The end date of the period for reporting aggregate metrics
 	 * @param numMonths The number of months
-	 * @return The start date
+	 * @return The start date in UTC numMonths prior from now
 	 */
-	public LocalDate getMonthToDate(LocalDate from, int numMonths) {
-		return from.minusMonths(numMonths);
+	public LocalDate getMonthToDate(int numMonths) {
+		return LocalDate.now(ZONE_ID).minusMonths(numMonths);
 	}
 	
 	/**
 	 * 
-	 * @param from
-	 * 	The end date of the period for reporting aggregate metrics
-	 * @return The start date one year prior to from
+	 * @return The start date in UTC of January 1st of the current year
 	 */
-	public LocalDate getYearToDate(LocalDate from) {
-		return from.minusYears(1);
+	public LocalDate getYearToDate() {
+		return LocalDate.of(LocalDate.now(ZONE_ID).getYear(),
+				1, 
+				1);
 	}
 }

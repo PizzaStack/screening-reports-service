@@ -1,6 +1,7 @@
 package com.revature.screenforce.time;
 
 import java.time.LocalDate;
+import java.time.ZoneOffset;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -19,9 +20,9 @@ public class TestTime {
 	
 	@Test
 	public void testWeekBefore() {
-		LocalDate today = LocalDate.of(2019, 2, 7);
-		Assert.assertEquals(LocalDate.of(2019, 1, 31), time.getWeekToDate(today, 1));
-		Assert.assertEquals(LocalDate.of(2019, 1, 7), time.getMonthToDate(today, 1));
-		Assert.assertEquals(LocalDate.of(2018, 2, 7), time.getYearToDate(today));
+		LocalDate today = LocalDate.now(ZoneOffset.UTC);
+		Assert.assertEquals(today.minusWeeks(1), time.getWeekToDate(1));
+		Assert.assertEquals(today.minusMonths(1), time.getMonthToDate(1));
+		Assert.assertEquals(LocalDate.of(today.getYear(), 1, 1), time.getYearToDate());
 	}
 }
