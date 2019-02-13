@@ -34,8 +34,6 @@ public class Screener {
 	@JoinColumn(name = "SCREENER_ID")
 	private List<Screening> screenings;
 
-	
-
 	public List<Screening> getScreenings() {
 		return screenings;
 	}

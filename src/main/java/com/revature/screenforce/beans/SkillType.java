@@ -12,6 +12,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.persistence.JoinColumn;
@@ -46,7 +47,7 @@ public class SkillType /*implements Serializable*/ {
     @ApiModelProperty(value = "is the SkillType currently active")
     @Column(name = "is_active")
     private boolean isActive;
-	
+    
 	public SkillType() {
 		super();
 	}

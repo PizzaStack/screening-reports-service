@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiModelProperty;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -17,7 +18,7 @@ public class Screening {
 	@ApiModelProperty(value = "Id of the screening")
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	@Column(name = "id")
+	@Column(name = "SCREENING_ID")
 	private int screeningId;
 
 	@ApiModelProperty(value = "The Scheduled Screening connected to the screening")
@@ -64,11 +65,27 @@ public class Screening {
 	@ApiModelProperty(value = "Enum denoting the current status of the screening")
 	@Column(name = "STATUS")
 	private String status;
+	
+	@ApiModelProperty(value = "The Screening connected to the screening")
+	@OneToMany(fetch = FetchType.EAGER)
+	@JoinColumn(name = "SCREENING_ID")
+	private List<Bucket> buckets;
 
-	public Screening() {
+	public List<Bucket> getBuckets() {
+		return buckets;
 	}
 
-	public Screening(ScheduledScreening scheduledScreening, int screenerId, int skillType, Double compositeScore, String aboutMeCommentary, String generalCommentary, String softSkillCommentary, Date startDateTime, Date endDateTime, Boolean softSkillsVerdict, String status) {
+	public void setBuckets(List<Bucket> buckets) {
+		this.buckets = buckets;
+	}
+
+	public Screening() {
+		super();
+	}
+	public Screening(ScheduledScreening scheduledScreening, int screenerId, 
+			int skillType, Double compositeScore, String aboutMeCommentary, 
+			String generalCommentary, String softSkillCommentary, Date startDateTime, 
+			Date endDateTime, Boolean softSkillsVerdict, String status) {
 		this.scheduledScreening = scheduledScreening;
 		this.screenerId = screenerId;
 		this.skillType = skillType;
