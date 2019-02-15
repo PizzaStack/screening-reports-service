@@ -32,7 +32,7 @@ public class Screening {
 
 	@ApiModelProperty(value = "Id referencing a training track in the screening-admin-service")
 	@Column(name = "SKILL_TYPE_ID")
-	private int skillType;
+	private int skillTypeId;
 
 	@ApiModelProperty(value = "The total score the candidate recieved")
 	@Column(name = "COMPOSITE_SCORE")
@@ -83,12 +83,12 @@ public class Screening {
 		super();
 	}
 	public Screening(ScheduledScreening scheduledScreening, int screenerId, 
-			int skillType, Double compositeScore, String aboutMeCommentary, 
+			int skillTypeId, Double compositeScore, String aboutMeCommentary, 
 			String generalCommentary, String softSkillCommentary, Date startDateTime, 
 			Date endDateTime, Boolean softSkillsVerdict, String status) {
 		this.scheduledScreening = scheduledScreening;
 		this.screenerId = screenerId;
-		this.skillType = skillType;
+		this.skillTypeId = skillTypeId;
 		this.compositeScore = compositeScore;
 		this.aboutMeCommentary = aboutMeCommentary;
 		this.generalCommentary = generalCommentary;
@@ -123,12 +123,12 @@ public class Screening {
 		this.screenerId = screenerId;
 	}
 
-	public int getSkillType() {
-		return skillType;
+	public int getSkillTypeId() {
+		return skillTypeId;
 	}
 
-	public void setSkillType(int skillType) {
-		this.skillType = skillType;
+	public void setSkillTypeId(int skillTypeId) {
+		this.skillTypeId = skillTypeId;
 	}
 
 	public Double getCompositeScore() {
@@ -202,7 +202,7 @@ public class Screening {
 		Screening screening = (Screening) o;
 		return getScreeningId() == screening.getScreeningId() &&
 				getScreenerId() == screening.getScreenerId() &&
-				getSkillType() == screening.getSkillType() &&
+				getSkillTypeId() == screening.getSkillTypeId() &&
 				Objects.equals(getScheduledScreening(), screening.getScheduledScreening()) &&
 				Objects.equals(getCompositeScore(), screening.getCompositeScore()) &&
 				Objects.equals(getAboutMeCommentary(), screening.getAboutMeCommentary()) &&
@@ -216,7 +216,7 @@ public class Screening {
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(getScreeningId(), getScheduledScreening(), getScreenerId(), getSkillType(), getCompositeScore(), getAboutMeCommentary(), getGeneralCommentary(), getSoftSkillCommentary(), getStartDateTime(), getEndDateTime(), getSoftSkillsVerdict(), getStatus());
+		return Objects.hash(getScreeningId(), getScheduledScreening(), getScreenerId(), getSkillTypeId(), getCompositeScore(), getAboutMeCommentary(), getGeneralCommentary(), getSoftSkillCommentary(), getStartDateTime(), getEndDateTime(), getSoftSkillsVerdict(), getStatus());
 	}
 
 	@Override
@@ -225,7 +225,7 @@ public class Screening {
 				"screeningId=" + screeningId +
 				", scheduledScreening=" + scheduledScreening +
 				", screenerId=" + screenerId +
-				", skillType=" + skillType +
+				", skillType=" + skillTypeId +
 				", compositeScore=" + compositeScore +
 				", aboutMeCommentary='" + aboutMeCommentary + '\'' +
 				", generalCommentary='" + generalCommentary + '\'' +

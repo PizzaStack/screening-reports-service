@@ -73,13 +73,11 @@ public class ReportsServiceImp {
 			for (Screening s : screenings) {
 				ScheduledScreening ss = s.getScheduledScreening();
 				scheduledScreenings.add(ss);
-				int skillTypeId = ss.getSkillTypeId();
-				s.getSkillType();
-				SkillType st = skillTypeDAO.getBySkillTypeId(skillTypeId);
-				skillTypes.add(st);
 				
 				buckets.add(s.getBuckets());
-				System.out.println("screening " + s.getScreenerId() + " has buckets: " + s.getBuckets());
+				
+				int skillTypeId = s.getSkillTypeId();
+				skillTypes.add(skillTypeDAO.getBySkillTypeId(skillTypeId));
 				
 				SoftSkillViolation softSkillViolation = new SoftSkillViolation();
 				softSkillViolations.add(softSkillViolationRepository.getByScreeningId(s.getScreeningId()));
@@ -108,6 +106,8 @@ public class ReportsServiceImp {
 					}
 				}
 			}
+			
+			
 			System.out.println("scoresByDescription: " + scoresByDescription);
 			System.out.println("numScoresPerDescription: " + numScoresPerDescription);
 			Set<String> keyset = scoresByDescription.keySet();
