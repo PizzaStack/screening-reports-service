@@ -1,11 +1,19 @@
 package com.revature.screenforce.beans;
 
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
+
+import io.swagger.annotations.ApiModelProperty;
 
 @Entity
 @Table(name="SCREENER")
@@ -20,6 +28,19 @@ public class Screener {
 	
 	@Column(name="EMAIL")
 	private String email;
+	
+	@ApiModelProperty(value = "The Screening connected to the screening")
+	@OneToMany(fetch = FetchType.EAGER)
+	@JoinColumn(name = "SCREENER_ID")
+	private List<Screening> screenings;
+
+	public List<Screening> getScreenings() {
+		return screenings;
+	}
+
+	public void setScreenings(List<Screening> screenings) {
+		this.screenings = screenings;
+	}
 
 	public int getScreenerId() {
 		return screenerId;
@@ -57,7 +78,6 @@ public class Screener {
 		// TODO Auto-generated constructor stub
 	}
 
-	
 	
 	
 }
