@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,10 +53,7 @@ public class ReportsServiceImp {
 		List<ScheduledScreening> scheduledScreenings = new ArrayList<>();
 		List<SkillType> skillTypes = new ArrayList<>();
 		List<List<Bucket>> buckets = new ArrayList<List<Bucket>>();
-		
-		//List<List<Question>> questions = new ArrayList<List<Question>>();
-		//List<List<QuestionScore>> questionScores = new ArrayList<List<QuestionScore>>();
-		
+
 		List<SoftSkillViolation> softSkillViolations = new ArrayList<SoftSkillViolation>();
 		List<ViolationType> violationTypes = new ArrayList<ViolationType>();
 		
@@ -63,6 +61,7 @@ public class ReportsServiceImp {
 		Map<String, Integer> numScoresPerDescription = new HashMap<String, Integer>();
 		
 		if (screenings != null) {
+			EntityManager em
 			for (Screening s : screenings) {
 				ScheduledScreening ss = s.getScheduledScreening();
 				scheduledScreenings.add(ss);
@@ -72,6 +71,7 @@ public class ReportsServiceImp {
 				skillTypes.add(st);
 				
 				buckets.add(s.getBuckets());
+				System.out.println("screening " + s.getScreenerId() + " has buckets: " + s.getBuckets());
 				
 				SoftSkillViolation softSkillViolation = new SoftSkillViolation();
 				softSkillViolations.add(softSkillViolationRepository.getByScreeningId(s.getScreeningId()));
@@ -82,11 +82,13 @@ public class ReportsServiceImp {
 			for (List<Bucket> bl : buckets) {
 				for (Bucket b : bl) {
 					//System.out.println("bucket: " + b);
-					for (Question q : b.getQuestions()) {
+					//for (Question q : b.getQuestions()) {
 						//System.out.println("q: " + q);
 						String key = b.getBucketDescription();
-						for (QuestionScore qs : q.getQuestionScores()) {
+						List<QuestionScore> questionScores = questionScoreRepository.findAllByBucketId(b.getBucketId());
+						for (QuestionScore qs : questionScores) {
 							//System.out.println("qs: " + qs);
+							System.out.println("----- bucket" + b.getBucketId() + " has questionScores: " + qs);
 							Double value = qs.getScore();
 							if (key == null || value == null) continue;
 							if (!scoresByDescription.containsKey(key)) {
@@ -100,7 +102,7 @@ public class ReportsServiceImp {
 								numScoresPerDescription.put(key, numScoresPerDescription.get(key)+1);
 							}
 						}
-					}
+					//}
 				}
 			}
 			System.out.println("scoresByDescription: " + scoresByDescription);

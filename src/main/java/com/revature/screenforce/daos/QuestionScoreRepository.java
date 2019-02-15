@@ -24,5 +24,5 @@ public interface QuestionScoreRepository extends JpaRepository<QuestionScore, In
 	 * @return List of question scores
 	 */
 	List<QuestionScore> findAllByScreeningScreeningId(int screeningId);
-
+	List<QuestionScore> findAllByBucketId(int bucketId);
 }

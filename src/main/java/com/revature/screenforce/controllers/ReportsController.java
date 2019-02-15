@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.google.gson.JsonArray;
+import com.revature.screenforce.services.ReportByCriteria;
 import com.revature.screenforce.services.ReportsServiceImp;
 
 @RestController
@@ -19,12 +20,14 @@ import com.revature.screenforce.services.ReportsServiceImp;
 @RequestMapping(value="/reports")
 public class ReportsController {
 	@Autowired ReportsServiceImp reportsService;
+	ReportByCriteria rbc = new ReportByCriteria();
 	
 	@GetMapping("/{email}/{weeks}")
 	public @ResponseBody String getReportByEmailAndWeeks(
 			@PathVariable(value="email") String email, 
 			@PathVariable(value="weeks") String weeks) {
 		String jsonReport = reportsService.getJsonReportForEmailAndWeeks(email, weeks);
+		//String jsonReport = rbc.getIndividualReport(email, weeks);
 		return jsonReport;
 	}
 }
