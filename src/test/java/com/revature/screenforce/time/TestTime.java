@@ -23,6 +23,6 @@ public class TestTime {
 		LocalDate today = LocalDate.now(ZoneOffset.UTC);
 		Assert.assertEquals(today.minusWeeks(1), time.getWeekToDate(1));
 		Assert.assertEquals(today.minusMonths(1), time.getMonthToDate(1));
-		Assert.assertEquals(today.minusYears(1), time.getYearToDate());
+		Assert.assertEquals(LocalDate.of(today.getYear(), 1, 1), time.getYearToDate());
 	}
 }

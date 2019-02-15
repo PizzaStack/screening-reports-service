@@ -3,7 +3,7 @@
 --------------------------------------------------------
 CREATE SEQUENCE    SCREENER_SEQUENCE  MINVALUE 1  INCREMENT BY 1 START WITH 1;
 INSERT INTO SCREENER (SCREENER_ID,NAME,EMAIL) VALUES (SCREENER_SEQUENCE.NEXTVAL, 'Smith, John', 'John.Smith@revature.com');
-INSERT INTO SCREENER (SCREENER_ID,NAME,EMAIL) VALUES (SCREENER_SEQUENCE.NEXTVAL, 'Jackson, Janet', 'Janet.Jackson@revature.com');
+INSERT INTO SCREENER (SCREENER_ID,NAME,EMAIL) VALUES (SCREENER_SEQUENCE.NEXTVAL, 'Smith, Jane', 'Jane.Smith@revature.com');
 INSERT INTO SCREENER (SCREENER_ID,NAME,EMAIL) VALUES (SCREENER_SEQUENCE.NEXTVAL, 'Walker, Paul', 'Paul.Walker@revature.com');
 
 insert into SKILL_TYPE (SKILL_TYPE_ID, TITLE, IS_ACTIVE) VALUES (1, 'Soft Skills', 1);
@@ -152,7 +152,7 @@ insert into QUESTION (QUESTION_ID, BUCKET_ID, IS_ACTIVE, QUESTION_TEXT, SAMPLE_A
 values (10008,414,1,'What tags are used in the WSDL?' , 'html,h1, h2. ' , 'Operation ' , ' Binding, operation, port.' , ' Binding, operation, port, port type, message, documentation. ' , 'Binding, operation, port, port type, message, documentation, definition, service.' );
 insert into QUESTION (QUESTION_ID, BUCKET_ID, IS_ACTIVE, QUESTION_TEXT, SAMPLE_ANSWER_1, SAMPLE_ANSWER_2, SAMPLE_ANSWER_3, SAMPLE_ANSWER_4, SAMPLE_ANSWER_5) 
 values (10009,414,1,'What tags are used for a SOAP message?' , 'S,M,L, XL ' , 'Body ' , ' Body, header' , ' Body, header, envelope ' , 'Body, header, envelope, fault. Body and envelope are mandatory, the other tags are optional. The fault tag itself contains several tags, namely fault-actor, fault-string, fault-code, and fault-details.' );
-insert into QUESTION (QUESTION_ID, BUCKET_ID, IS_ACTIVE, QUESTION_TEXT, SAMPLE_ANSWER_1, SAMPLE_ANSWER_2, SAM1PLE_ANSWER_3, SAMPLE_ANSWER_4, SAMPLE_ANSWER_5) 
+insert into QUESTION (QUESTION_ID, BUCKET_ID, IS_ACTIVE, QUESTION_TEXT, SAMPLE_ANSWER_1, SAMPLE_ANSWER_2, SAMPLE_ANSWER_3, SAMPLE_ANSWER_4, SAMPLE_ANSWER_5) 
 values (10004,416,1,'What operations in REST are idempotent?' , 'None, no operation can grasp the power of idem, its logically impossible. ' , 'GET and PUT ' , ' GET, PUT, POST, DELETE.' , 'GET, PUT, DELETE. ' , ' GET, PUT, and DELETE. An idempotent operation can be repeated an arbitrary number of times without changing the database state. ' );
 insert into QUESTION (QUESTION_ID, BUCKET_ID, IS_ACTIVE, QUESTION_TEXT, SAMPLE_ANSWER_1, SAMPLE_ANSWER_2, SAMPLE_ANSWER_3, SAMPLE_ANSWER_4, SAMPLE_ANSWER_5) 
 values (10005,416,1,'How many languages can be used in a REST service?' , 'One, REST only supports Java. ' , 'Two, REST is compatible with both the Java and .Net stacks. ' , ' Three. REST supports Java, C, and JavaScript in order to provide web and back end functionality. ' , 'Any amount. ' , ' REST affords interoperability which allows any number of languages to be used simultaneously to create the service. ' );

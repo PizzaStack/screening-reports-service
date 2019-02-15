@@ -45,6 +45,16 @@ public class ReportsServiceImp {
 	@Autowired SoftSkillViolationRepository softSkillViolationRepository;
 	@Autowired ViolationTypeRepository violationTypeRepository;
 	@Autowired WeightDAO weightDAO;
+
+	public List<String> getAllEmails(String email){
+		List<Screener> screenerList = screenerRepository.findAllByEmailContainingIgnoreCase(email);
+		System.out.println(screenerList.size());
+		List<String> emailList = new ArrayList<>();
+		for(Screener screener : screenerList) {
+				emailList.add(screener.getEmail());
+		}
+		return emailList;
+	}
 	
 	public String getJsonReportForEmailAndWeeks(String email, String weeks) {
 		Gson gson = new Gson();
@@ -53,7 +63,6 @@ public class ReportsServiceImp {
 		List<ScheduledScreening> scheduledScreenings = new ArrayList<>();
 		List<SkillType> skillTypes = new ArrayList<>();
 		List<List<Bucket>> buckets = new ArrayList<List<Bucket>>();
-
 		List<SoftSkillViolation> softSkillViolations = new ArrayList<SoftSkillViolation>();
 		List<ViolationType> violationTypes = new ArrayList<ViolationType>();
 		
@@ -61,7 +70,6 @@ public class ReportsServiceImp {
 		Map<String, Integer> numScoresPerDescription = new HashMap<String, Integer>();
 		
 		if (screenings != null) {
-			EntityManager em
 			for (Screening s : screenings) {
 				ScheduledScreening ss = s.getScheduledScreening();
 				scheduledScreenings.add(ss);
@@ -75,34 +83,29 @@ public class ReportsServiceImp {
 				
 				SoftSkillViolation softSkillViolation = new SoftSkillViolation();
 				softSkillViolations.add(softSkillViolationRepository.getByScreeningId(s.getScreeningId()));
-				
 				violationTypes.add(softSkillViolation.getViolationType());
 			}
-			//System.out.println("buckets: " + buckets);
+
 			for (List<Bucket> bl : buckets) {
 				for (Bucket b : bl) {
-					//System.out.println("bucket: " + b);
-					//for (Question q : b.getQuestions()) {
-						//System.out.println("q: " + q);
-						String key = b.getBucketDescription();
-						List<QuestionScore> questionScores = questionScoreRepository.findAllByBucketId(b.getBucketId());
-						for (QuestionScore qs : questionScores) {
-							//System.out.println("qs: " + qs);
-							System.out.println("----- bucket" + b.getBucketId() + " has questionScores: " + qs);
-							Double value = qs.getScore();
-							if (key == null || value == null) continue;
-							if (!scoresByDescription.containsKey(key)) {
-								scoresByDescription.put(key, value);
-								numScoresPerDescription.put(key, 1);
-							}
-							else {
-								double currentSum = scoresByDescription.get(key);
-								double newVal = currentSum + value;
-								scoresByDescription.put(key, newVal);
-								numScoresPerDescription.put(key, numScoresPerDescription.get(key)+1);
-							}
+					//System.out.println("b: " + b);
+					String key = b.getBucketDescription();
+					List<QuestionScore> questionScores = questionScoreRepository.findAllByBucketId(b.getBucketId());
+					for (QuestionScore qs : questionScores) {
+						System.out.println("----- bucket" + b.getBucketId() + " has questionScores: " + qs);
+						Double value = qs.getScore();
+						if (key == null || value == null) continue;
+						if (!scoresByDescription.containsKey(key)) {
+							scoresByDescription.put(key, value);
+							numScoresPerDescription.put(key, 1);
 						}
-					//}
+						else {
+							double currentSum = scoresByDescription.get(key);
+							double newVal = currentSum + value;
+							scoresByDescription.put(key, newVal);
+							numScoresPerDescription.put(key, numScoresPerDescription.get(key)+1);
+						}
+					}
 				}
 			}
 			System.out.println("scoresByDescription: " + scoresByDescription);
@@ -119,24 +122,7 @@ public class ReportsServiceImp {
 			}
 		}
 		
-		/*
-		NEED: 
-		AVG(score) from skilltype,
-		AVG(score) from bucket_description,
-		COUNT(*) from scheduled_screenings #screener -> screening -> scheduled_screening
-		(*) from question_values SORT BY value DESC LIMIT 5 #question -> question_values
-		COUNT(*) from violations
-		*/
-		/*
-		Double sum = 0.0;
-		double avgSkillTypeScore;
-		if (screenings != null) {
-			for (Screening s : screenings) {
-				sum += ((s.getCompositeScore() != null) ? s.getCompositeScore() : 0);
-			}
-			avgSkillTypeScore = sum/screenings.size();
-		}
-		*/
+		
 	
 		int numScheduledScreenings = scheduledScreenings.size();
 		int numViolationTypes = violationTypes.size();
