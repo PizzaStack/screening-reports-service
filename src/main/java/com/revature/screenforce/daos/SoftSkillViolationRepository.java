@@ -24,4 +24,6 @@ public interface SoftSkillViolationRepository extends JpaRepository<SoftSkillVio
 	List<SoftSkillViolation> findAllByScreeningId(int screeningId);
 
 	SoftSkillViolation getByScreeningId(int screeningId);
+
+	boolean existsByScreeningId(int screeningId);
 }

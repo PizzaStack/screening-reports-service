@@ -37,6 +37,10 @@ public class Screener {
 	public List<Screening> getScreenings() {
 		return screenings;
 	}
+	
+	public boolean hasScreenings() {
+		return ((screenings == null) ? false : true);
+	}
 
 	public void setScreenings(List<Screening> screenings) {
 		this.screenings = screenings;
@@ -75,9 +79,12 @@ public class Screener {
 
 	public Screener() {
 		super();
-		// TODO Auto-generated constructor stub
 	}
 
-	
-	
+	@Override
+	public String toString() {
+		return "Screener [screenerId=" + screenerId + ", " + (name != null ? "name=" + name + ", " : "")
+				+ (email != null ? "email=" + email + ", " : "")
+				+ (screenings != null ? "screenings=" + screenings : "") + "]";
+	}
 }
