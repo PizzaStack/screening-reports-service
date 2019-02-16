@@ -90,6 +90,10 @@ public class SoftSkillViolation {
 	public void setViolationType(ViolationType violationType) {
 		this.violationType = violationType;
 	}
+	
+	public boolean hasViolationType() {
+		return ((this.violationType == null) ? false : true);
+	}
 
 	public String getComment() {
 		return comment;
