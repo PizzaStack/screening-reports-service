@@ -47,7 +47,9 @@ public class ReportsService {
 	@Autowired WeightDAO weightDAO;
 	private Map<String, Double> scoresByQuestion = new HashMap<String, Double>();
 	private Map<String, Integer> numScoresPerQuestion = new HashMap<String, Integer>();
-
+	private Map<String, Double> top5HardestQuestions = new TreeMap<>();
+	private ArrayList<String> questionKeys = new ArrayList<>();
+	
 	public List<String> getAllEmails(String email){
 		List<Screener> screenerList = screenerRepository.findAllByEmailContainingIgnoreCase(email);
 		//System.out.println(screenerList.size());
@@ -162,8 +164,6 @@ public class ReportsService {
 				//System.out.println(scoreBySkillType);
 				scoresBySkillType.put(key,  scoreBySkillType);
 			}
-			
-			//System.out.println("scoresByQuestion = " + scoresByQuestion);
 		}
 		
 		if (violationTypes != null) {
@@ -189,6 +189,11 @@ public class ReportsService {
 	}
 
 	public String getReport(String email, String weeks) {
+		if (!scoresByQuestion.isEmpty()) scoresByQuestion.clear();
+		if (!numScoresPerQuestion.isEmpty()) numScoresPerQuestion.clear();
+		if (!top5HardestQuestions.isEmpty()) top5HardestQuestions.clear();
+		if (!questionKeys.isEmpty()) questionKeys.clear();
+		
 		List<ReportByEmailAndWeeksModel> reports = new ArrayList<>();
 		if (email == null || email.isEmpty() || email.equals("null")) {
 			List<Screener> screeners = screenerRepository.findAll();
@@ -207,12 +212,41 @@ public class ReportsService {
 			double scoreByQuestion = scoresByQuestion.get(key) / (double) numScoresPerQuestion.get(key);
 			//System.out.println(scoreByQuestion);
 			scoresByQuestion.put(key,  scoreByQuestion);
+			questionKeys.add(key);
 		}
 		
-		ReportByWeeksModel reportByWeeksModel = new ReportByWeeksModel(reports, scoresByQuestion);
+		top5HardestQuestions = top5HardestSort(scoresByQuestion, questionKeys);
+		
+		//System.out.println(top5HardestQuestions);
+		//System.out.println("scoresByQuestion = " + scoresByQuestion);
+		
+		ReportByWeeksModel reportByWeeksModel = new ReportByWeeksModel(reports, top5HardestQuestions);
 		Gson gson = new Gson();
 		String json = gson.toJson(reportByWeeksModel);
 		return json;
+	}
+	
+	public TreeMap<String, Double> top5HardestSort(Map<String, Double> mapToSort, ArrayList<String> keys){
+		
+		TreeMap<String, Double> sortedTreeMap = new TreeMap<>();
+		TreeSet<String> keysAndValues = new TreeSet<>();
+		
+		for(String key : keys) {
+			keysAndValues.add(String.valueOf(mapToSort.get(key)) + ";" + key);
+		}
+		
+		int count = 1;
+		
+		for(String keyAndValue : keysAndValues) {
+			if(count < 6) {
+				String key = keyAndValue.substring(keyAndValue.indexOf(";") + 1, keyAndValue.length());
+				Double value = Double.parseDouble(keyAndValue.substring(0, keyAndValue.indexOf(";")));
+				sortedTreeMap.put(String.valueOf(count) + ". " + key, value);
+			}
+			count++;
+		}
+		
+		return sortedTreeMap;
 	}
 }
 
