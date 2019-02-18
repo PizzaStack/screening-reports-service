@@ -7,25 +7,16 @@ import java.util.TreeMap;
 public class ReportByEmailAndWeeksModel {
 	Integer screenerId;
 	String email;
-	Map<String, Double> scoresBySkillType = new HashMap<String, Double>();
-	Map<String, Double> scoresByDescription = new HashMap<String, Double>();
-	Map<String, Integer> numViolationsByType = new HashMap<String, Integer>();
-	int numScheduledScreenings;
+	String name;
 	
 	public ReportByEmailAndWeeksModel(
 			Integer screenerId, 
 			String email,
-			Map<String, Double> scoresBySkillType,
-			Map<String, Double> scoresByDescription,
-			Map<String, Integer> numViolationsByType,
-			int numScheduledScreenings) {
+			String name) {
 
 		this.screenerId = screenerId;
 		this.email = email;
-		this.scoresBySkillType = scoresBySkillType;
-		this.scoresByDescription = scoresByDescription;
-		this.numScheduledScreenings = numScheduledScreenings;
-		this.numViolationsByType = numViolationsByType;
+		this.name = name;
 	}
 }
 

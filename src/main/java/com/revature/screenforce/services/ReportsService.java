@@ -45,10 +45,23 @@ public class ReportsService {
 	@Autowired SoftSkillViolationRepository softSkillViolationRepository;
 	@Autowired ViolationTypeRepository violationTypeRepository;
 	@Autowired WeightDAO weightDAO;
+	
 	private Map<String, Double> scoresByQuestion = new HashMap<String, Double>();
 	private Map<String, Integer> numScoresPerQuestion = new HashMap<String, Integer>();
 	private Map<String, Double> top5HardestQuestions = new TreeMap<>();
 	private ArrayList<String> questionKeys = new ArrayList<>();
+	private List<SoftSkillViolation> softSkillViolations = new ArrayList<SoftSkillViolation>();
+	private List<ViolationType> violationTypes = new ArrayList<ViolationType>();
+	
+	private Map<String, List<Bucket>> bucketsBySkillType = new HashMap<String, List<Bucket>>();
+	private Map<String, Double> scoresByDescription = new HashMap<String, Double>();
+	private Map<String, Integer> numScoresPerDescription = new HashMap<String, Integer>();
+	private Map<String, Double> scoresBySkillType = new HashMap<String, Double>();
+	private Map<String, Integer> numScoresPerSkillType = new HashMap<String, Integer>();
+	
+	private Map<String, Integer> numViolationsByType = new HashMap<String, Integer>();
+	
+	int numScheduledScreenings = 0;
 	
 	public List<String> getAllEmails(String email){
 		List<Screener> screenerList = screenerRepository.findAllByEmailContainingIgnoreCase(email);
@@ -66,16 +79,6 @@ public class ReportsService {
 		if (screener.getScreenings() == null) return null;
 		List<Screening> screenings = screener.getScreenings();
 		List<ScheduledScreening> scheduledScreenings = new ArrayList<ScheduledScreening>();
-		List<SoftSkillViolation> softSkillViolations = new ArrayList<SoftSkillViolation>();
-		List<ViolationType> violationTypes = new ArrayList<ViolationType>();
-		
-		Map<String, List<Bucket>> bucketsBySkillType = new HashMap<String, List<Bucket>>();
-		Map<String, Double> scoresByDescription = new HashMap<String, Double>();
-		Map<String, Integer> numScoresPerDescription = new HashMap<String, Integer>();
-		Map<String, Double> scoresBySkillType = new HashMap<String, Double>();
-		Map<String, Integer> numScoresPerSkillType = new HashMap<String, Integer>();
-		
-		Map<String, Integer> numViolationsByType = new HashMap<String, Integer>();
 		
 		if (screenings != null) {
 			for (Screening s : screenings) {
@@ -91,6 +94,8 @@ public class ReportsService {
 					if (softSkillViolation.hasViolationType())
 						violationTypes.add(softSkillViolation.getViolationType());
 				}
+				
+				numScheduledScreenings += scheduledScreenings.size();
 			}
 
 			Set<String> skillTypeTypes = bucketsBySkillType.keySet();
@@ -144,26 +149,6 @@ public class ReportsService {
 					}
 				}
 			}
-			
-			Set<String> keyset = scoresByDescription.keySet();
-			Iterator<String> iter = keyset.iterator();
-			while (iter.hasNext()) {
-				String key = iter.next();
-				if (scoresByDescription.get(key) != 0) {
-					double scoreByDescription = scoresByDescription.get(key) / (double) numScoresPerDescription.get(key);
-					scoresByDescription.put(key, scoreByDescription);
-				}
-				//System.out.println("Description=" + key + "&Total Score=" + scoresByDescription.get(key));
-			}
-			
-			iter = scoresBySkillType.keySet().iterator();
-			while (iter.hasNext()) {
-				String key = iter.next();
-				//System.out.print("key=" + key + "&value=");
-				double scoreBySkillType = scoresBySkillType.get(key) / (double) numScoresPerSkillType.get(key);
-				//System.out.println(scoreBySkillType);
-				scoresBySkillType.put(key,  scoreBySkillType);
-			}
 		}
 		
 		if (violationTypes != null) {
@@ -177,23 +162,15 @@ public class ReportsService {
 			}
 		}
 		
-		int numScheduledScreenings = scheduledScreenings.size();
 		ReportByEmailAndWeeksModel report = new ReportByEmailAndWeeksModel(
 				new Integer(screener.getScreenerId()),
 				screener.getEmail(),
-				scoresBySkillType, 
-				scoresByDescription,
-				numViolationsByType, 
-				numScheduledScreenings);
+				screener.getName());
 		return report;
 	}
 
 	public String getReport(String email, String weeks) {
-		if (!scoresByQuestion.isEmpty()) scoresByQuestion.clear();
-		if (!numScoresPerQuestion.isEmpty()) numScoresPerQuestion.clear();
-		if (!top5HardestQuestions.isEmpty()) top5HardestQuestions.clear();
-		if (!questionKeys.isEmpty()) questionKeys.clear();
-		
+		reset();
 		List<ReportByEmailAndWeeksModel> reports = new ArrayList<>();
 		if (email == null || email.isEmpty() || email.equals("null")) {
 			List<Screener> screeners = screenerRepository.findAll();
@@ -205,7 +182,27 @@ public class ReportsService {
 			reports.add(getJsonReportForEmailAndWeeks(email, weeks));
 		}
 		
-		Iterator<String> iter = scoresByQuestion.keySet().iterator();
+		Set<String> keyset = scoresByDescription.keySet();
+		Iterator<String> iter = keyset.iterator();
+		while (iter.hasNext()) {
+			String key = iter.next();
+			if (scoresByDescription.get(key) != 0) {
+				double scoreByDescription = scoresByDescription.get(key) / (double) numScoresPerDescription.get(key);
+				scoresByDescription.put(key, scoreByDescription);
+			}
+			//System.out.println("Description=" + key + "&Total Score=" + scoresByDescription.get(key));
+		}
+		
+		iter = scoresBySkillType.keySet().iterator();
+		while (iter.hasNext()) {
+			String key = iter.next();
+			//System.out.print("key=" + key + "&value=");
+			double scoreBySkillType = scoresBySkillType.get(key) / (double) numScoresPerSkillType.get(key);
+			//System.out.println(scoreBySkillType);
+			scoresBySkillType.put(key,  scoreBySkillType);
+		}
+		
+		iter = scoresByQuestion.keySet().iterator();
 		while (iter.hasNext()) {
 			String key = iter.next();
 			//System.out.print("questionText=" + key + "&value=");
@@ -214,13 +211,18 @@ public class ReportsService {
 			scoresByQuestion.put(key,  scoreByQuestion);
 			questionKeys.add(key);
 		}
-		
 		top5HardestQuestions = top5HardestSort(scoresByQuestion, questionKeys);
 		
 		//System.out.println(top5HardestQuestions);
 		//System.out.println("scoresByQuestion = " + scoresByQuestion);
 		
-		ReportByWeeksModel reportByWeeksModel = new ReportByWeeksModel(reports, top5HardestQuestions);
+		ReportByWeeksModel reportByWeeksModel = new ReportByWeeksModel(
+				reports, 
+				scoresByDescription, 
+				scoresBySkillType, 
+				top5HardestQuestions,
+				numViolationsByType,
+				numScheduledScreenings);
 		Gson gson = new Gson();
 		String json = gson.toJson(reportByWeeksModel);
 		return json;
@@ -247,6 +249,21 @@ public class ReportsService {
 		}
 		
 		return sortedTreeMap;
+	}
+	public void reset() {
+		numScheduledScreenings = 0;
+		if (!scoresByQuestion.isEmpty()) scoresByQuestion.clear();
+		if (!numScoresPerQuestion.isEmpty()) numScoresPerQuestion.clear();
+		if (!top5HardestQuestions.isEmpty()) top5HardestQuestions.clear();
+		if (!questionKeys.isEmpty()) questionKeys.clear();
+		if (!softSkillViolations.isEmpty()) softSkillViolations.clear();
+		if (!violationTypes.isEmpty()) violationTypes.clear();
+		if (!bucketsBySkillType.isEmpty()) bucketsBySkillType.clear();
+		if (!scoresByDescription.isEmpty()) scoresByDescription.clear();
+		if (!numScoresPerDescription.isEmpty()) numScoresPerDescription.clear();
+		if (!scoresBySkillType.isEmpty()) scoresBySkillType.clear();
+		if (!numScoresPerSkillType.isEmpty()) numScoresPerSkillType.clear();
+		if (!numViolationsByType.isEmpty()) numViolationsByType.clear();
 	}
 }
 
