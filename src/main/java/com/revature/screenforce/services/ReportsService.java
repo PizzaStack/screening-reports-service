@@ -1,5 +1,7 @@
 package com.revature.screenforce.services;
 
+import java.time.LocalDate;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -31,6 +33,7 @@ import com.revature.screenforce.daos.ViolationTypeRepository;
 import com.revature.screenforce.daos.WeightDAO;
 import com.revature.screenforce.models.ReportByEmailAndWeeksModel;
 import com.revature.screenforce.models.ReportByWeeksModel;
+import com.revature.screenforce.util.Time;
 
 @Service
 public class ReportsService {
@@ -69,6 +72,10 @@ public class ReportsService {
 	}
 	
 	public ReportByEmailAndWeeksModel getJsonReportForEmailAndWeeks(String email, String weeks) {
+		Time time = new Time();
+		LocalDate startDate = time.getWeekToDate(Integer.parseInt(weeks));
+		LocalDate endDate = LocalDate.now(ZoneOffset.UTC);
+		
 		Screener screener = screenerRepository.getByEmail(email);
 
 		if (screener.getScreenings() == null) return null;
@@ -77,6 +84,8 @@ public class ReportsService {
 		
 		if (screenings != null) {
 			for (Screening s : screenings) {
+				if(s.getEndDateTime().isAfter(startDate) && s.getEndDateTime().isBefore(endDate)) {
+				
 				ScheduledScreening ss = s.getScheduledScreening();
 				scheduledScreenings.add(ss);
 				
@@ -92,6 +101,7 @@ public class ReportsService {
 				}
 				
 				numScheduledScreenings += scheduledScreenings.size();
+			}
 			}
 
 			Set<String> skillTypeTypes = bucketsBySkillType.keySet();
@@ -186,6 +196,7 @@ public class ReportsService {
 			scoresByQuestion.put(key,  scoreByQuestion);
 			questionKeys.add(key);
 		}
+		System.out.println(questionKeys);
 		top5HardestQuestions = top5HardestSort(scoresByQuestion, questionKeys);
 		
 		for (ViolationType v : violationTypes) {
