@@ -1,17 +1,24 @@
 package com.revature.screenforce.services;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.google.gson.Gson;
 import com.revature.screenforce.beans.Bucket;
+import com.revature.screenforce.beans.Question;
 import com.revature.screenforce.beans.QuestionScore;
 import com.revature.screenforce.beans.ScheduledScreening;
 import com.revature.screenforce.beans.Screener;
@@ -41,7 +48,7 @@ public class ReportsService {
 
 	public List<String> getAllEmails(String email){
 		List<Screener> screenerList = screenerRepository.findAllByEmailContainingIgnoreCase(email);
-		System.out.println(screenerList.size());
+		//System.out.println(screenerList.size());
 		List<String> emailList = new ArrayList<>();
 		for(Screener screener : screenerList) {
 				emailList.add(screener.getEmail());
@@ -63,6 +70,8 @@ public class ReportsService {
 		Map<String, Integer> numScoresPerDescription = new HashMap<String, Integer>();
 		Map<String, Double> scoresBySkillType = new HashMap<String, Double>();
 		Map<String, Integer> numScoresPerSkillType = new HashMap<String, Integer>();
+		Map<String, Double> scoresByQuestion = new HashMap<String, Double>();
+		Map<String, Integer> numScoresPerQuestion = new HashMap<String, Integer>();
 		
 		Map<String, Integer> numViolationsByType = new HashMap<String, Integer>();
 		
@@ -83,39 +92,51 @@ public class ReportsService {
 			}
 
 			Set<String> skillTypeTypes = bucketsBySkillType.keySet();
-			System.out.println("SkillTypeTypes: " + skillTypeTypes + "\n");
+			//System.out.println("SkillTypeTypes: " + skillTypeTypes + "\n");
 			for (String st : skillTypeTypes) {
 				List<Bucket> bl = bucketsBySkillType.get(st);
-				System.out.println("BucketList: " + bl);
+				//System.out.println("BucketList: " + bl);
 				for (Bucket b : bl) {
 					String bucketKey = b.getBucketDescription();
-					List<QuestionScore> questionScores = questionScoreRepository.findAllByBucketId(b.getBucketId());
-					for (QuestionScore qs : questionScores) {
-						//System.out.println("\n---- bucket" + b.getBucketId() + " has questionScores: " + qs);
-						Double value = qs.getScore();
-						if (value == null) break;
-						if (!scoresBySkillType.containsKey(st)) {
-							scoresBySkillType.put(st, value);
-							numScoresPerSkillType.put(st, 1);
-						}
-						if (bucketKey == null) continue;
-						if (!scoresByDescription.containsKey(bucketKey)) {
-							scoresByDescription.put(bucketKey, value);
-							numScoresPerDescription.put(bucketKey, 1);
-						}
-						else {
-							double currentBucketSum = scoresByDescription.get(bucketKey);
-							double newBucketVal = currentBucketSum + value;
-							scoresByDescription.put(bucketKey, newBucketVal);
-							numScoresPerDescription.put(bucketKey, numScoresPerDescription.get(bucketKey) + 1);
-							
-							if (st == null) {
-								bucketsBySkillType.remove(st);
+					//List<QuestionScore> questionScores = questionScoreRepository.findAllByBucketId(b.getBucketId());
+					for (Question q : b.getQuestions()) {
+						String questionText = q.getQuestionText();
+						for (QuestionScore qs : q.getQuestionScores()) {
+							//System.out.println("\n---- bucket" + b.getBucketId() + " has questionScores: " + qs);
+							Double value = qs.getScore();
+							if (value == null) break;
+							if (!scoresBySkillType.containsKey(st)) {
+								scoresBySkillType.put(st, value);
+								numScoresPerSkillType.put(st, 1);
 							} else {
-								double currentSkillSum = scoresBySkillType.get(st);
-								double newSkillSum = currentSkillSum + value;
-								scoresBySkillType.put(st, newSkillSum);
-								numScoresPerSkillType.put(st, numScoresPerSkillType.get(st) + 1);
+								if (st == null) {
+									bucketsBySkillType.remove(st);
+								} else {
+									double currentSkillSum = scoresBySkillType.get(st);
+									double newSkillSum = currentSkillSum + value;
+									scoresBySkillType.put(st, newSkillSum);
+									numScoresPerSkillType.put(st, numScoresPerSkillType.get(st) + 1);
+								}
+							}
+							
+							if (bucketKey != null && !scoresByDescription.containsKey(bucketKey)) {
+								scoresByDescription.put(bucketKey, value);
+								numScoresPerDescription.put(bucketKey, 1);
+							} else {
+								double currentBucketSum = scoresByDescription.get(bucketKey);
+								double newBucketVal = currentBucketSum + value;
+								scoresByDescription.put(bucketKey, newBucketVal);
+								numScoresPerDescription.put(bucketKey, numScoresPerDescription.get(bucketKey) + 1);
+							}
+						
+							if (questionText != null && !scoresByQuestion.containsKey(questionText)) {
+								scoresByQuestion.put(questionText, value);
+								numScoresPerQuestion.put(questionText, 1);
+							} else {
+								double currentQuestionSum = scoresByQuestion.get(questionText);
+								double newQuestionSum = currentQuestionSum + value;
+								scoresByQuestion.put(questionText, newQuestionSum);
+								numScoresPerQuestion.put(questionText, numScoresPerQuestion.get(questionText) + 1);
 							}
 						}
 					}
@@ -130,17 +151,28 @@ public class ReportsService {
 					double scoreByDescription = scoresByDescription.get(key) / (double) numScoresPerDescription.get(key);
 					scoresByDescription.put(key, scoreByDescription);
 				}
-				System.out.println("Description=" + key + "&Total Score=" + scoresByDescription.get(key));
+				//System.out.println("Description=" + key + "&Total Score=" + scoresByDescription.get(key));
 			}
 			
 			iter = scoresBySkillType.keySet().iterator();
 			while (iter.hasNext()) {
 				String key = iter.next();
-				System.out.print("key=" + key + "&value=");
-				double scoreBySkillType = scoresBySkillType.get(key) / numScoresPerSkillType.get(key);
-				System.out.println(scoreBySkillType);
+				//System.out.print("key=" + key + "&value=");
+				double scoreBySkillType = scoresBySkillType.get(key) / (double) numScoresPerSkillType.get(key);
+				//System.out.println(scoreBySkillType);
 				scoresBySkillType.put(key,  scoreBySkillType);
 			}
+			
+			iter = scoresByQuestion.keySet().iterator();
+			while (iter.hasNext()) {
+				String key = iter.next();
+				//System.out.print("questionText=" + key + "&value=");
+				double scoreByQuestion = scoresByQuestion.get(key) / (double) numScoresPerQuestion.get(key);
+				//System.out.println(scoreByQuestion);
+				scoresByQuestion.put(key,  scoreByQuestion);
+			}
+			
+			//System.out.println("scoresByQuestion = " + scoresByQuestion);
 		}
 		
 		if (violationTypes != null) {
@@ -160,11 +192,12 @@ public class ReportsService {
 				screener.getEmail(),
 				scoresBySkillType, 
 				scoresByDescription,
+				scoresByQuestion,
 				numViolationsByType, 
 				numScheduledScreenings);
 		return report;
 	}
-	
+
 	public String getReport(String email, String weeks) {
 		List<ReportByEmailAndWeeksModel> reports = new ArrayList<>();
 		if (email == null || email.isEmpty() || email.equals("null")) {
@@ -182,5 +215,7 @@ public class ReportsService {
 		return json;
 	}
 }
+
+
 
 
