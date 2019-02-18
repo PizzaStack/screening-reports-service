@@ -4,6 +4,8 @@ import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 
 import javax.persistence.*;
+
+import java.time.LocalDate;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -52,11 +54,11 @@ public class Screening {
 
 	@ApiModelProperty(value = "Starting date and time of the screening")
 	@Column(name = "START_DATE")
-	private Date startDateTime;
+	private LocalDate startDateTime;
 
 	@ApiModelProperty(value = "Ending date and time of the screening")
 	@Column(name = "END_DATE")
-	private Date endDateTime;
+	private LocalDate endDateTime;
 
 	@ApiModelProperty(value = "Final verdict on the candidate's soft skills")
 	@Column(name = "SOFT_SKILL_VERDICT")
@@ -84,8 +86,8 @@ public class Screening {
 	}
 	public Screening(ScheduledScreening scheduledScreening, int screenerId, 
 			int skillTypeId, Double compositeScore, String aboutMeCommentary, 
-			String generalCommentary, String softSkillCommentary, Date startDateTime, 
-			Date endDateTime, Boolean softSkillsVerdict, String status) {
+			String generalCommentary, String softSkillCommentary, LocalDate startDateTime, 
+			LocalDate endDateTime, Boolean softSkillsVerdict, String status) {
 		this.scheduledScreening = scheduledScreening;
 		this.screenerId = screenerId;
 		this.skillTypeId = skillTypeId;
@@ -163,19 +165,19 @@ public class Screening {
 		this.softSkillCommentary = softSkillCommentary;
 	}
 
-	public Date getStartDateTime() {
+	public LocalDate getStartDateTime() {
 		return startDateTime;
 	}
 
-	public void setStartDateTime(Date startDateTime) {
+	public void setStartDateTime(LocalDate startDateTime) {
 		this.startDateTime = startDateTime;
 	}
 
-	public Date getEndDateTime() {
+	public LocalDate getEndDateTime() {
 		return endDateTime;
 	}
 
-	public void setEndDateTime(Date endDateTime) {
+	public void setEndDateTime(LocalDate endDateTime) {
 		this.endDateTime = endDateTime;
 	}
 

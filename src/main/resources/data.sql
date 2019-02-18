@@ -163,7 +163,7 @@ values (SCREENING_SEQUENCE.NEXTVAL, 3, 5, 50.0, 'intoComment8','generalComment8'
 Insert into SCREENING (SCREENING_ID, SCREENER_ID, SKILL_TYPE_ID,
 COMPOSITE_SCORE, ABOUT_COMMENT, GENERAL_COMMENT, SOFT_SKILL_COMMENT,
 START_DATE, END_DATE, SOFT_SKILL_VERDICT, STATUS, SCHEDULED_SCREENING_ID) 
-values (SCREENING_SEQUENCE.NEXTVAL, 3, 5, 50.0, 'intoComment8','generalComment8','softskillComment8', '2018-03-12', '2018-03-14', 1, 'Pending', 4328);
+values (SCREENING_SEQUENCE.NEXTVAL, 3, 5, 50.0, 'intoComment8','generalComment8','softskillComment8', '2018-03-12', '2018-02-14', 1, 'Pending', 4328);
 
 insert into bucket (bucket_id, screening_id, bucket_description, is_active) values (404, 4321, 'Java Applied', true);
 insert into bucket (bucket_id, screening_id, bucket_description, is_active) values (407, 4322, 'Hibernate', true);
