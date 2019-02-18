@@ -1,15 +1,11 @@
 package com.revature.screenforce.services;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
-import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -46,26 +42,25 @@ public class ReportsService {
 	@Autowired ViolationTypeRepository violationTypeRepository;
 	@Autowired WeightDAO weightDAO;
 	
-	private Map<String, Double> scoresByQuestion = new HashMap<String, Double>();
-	private Map<String, Integer> numScoresPerQuestion = new HashMap<String, Integer>();
+	private Map<String, Double> scoresByQuestion = new HashMap<>();
+	private Map<String, Integer> numScoresPerQuestion = new HashMap<>();
 	private Map<String, Double> top5HardestQuestions = new TreeMap<>();
 	private ArrayList<String> questionKeys = new ArrayList<>();
-	private List<SoftSkillViolation> softSkillViolations = new ArrayList<SoftSkillViolation>();
-	private List<ViolationType> violationTypes = new ArrayList<ViolationType>();
+	private List<SoftSkillViolation> softSkillViolations = new ArrayList<>();
+	private List<ViolationType> violationTypes = new ArrayList<>();
 	
-	private Map<String, List<Bucket>> bucketsBySkillType = new HashMap<String, List<Bucket>>();
-	private Map<String, Double> scoresByDescription = new HashMap<String, Double>();
-	private Map<String, Integer> numScoresPerDescription = new HashMap<String, Integer>();
-	private Map<String, Double> scoresBySkillType = new HashMap<String, Double>();
-	private Map<String, Integer> numScoresPerSkillType = new HashMap<String, Integer>();
+	private Map<String, List<Bucket>> bucketsBySkillType = new HashMap<>();
+	private Map<String, Double> scoresByDescription = new HashMap<>();
+	private Map<String, Integer> numScoresPerDescription = new HashMap<>();
+	private Map<String, Double> scoresBySkillType = new HashMap<>();
+	private Map<String, Integer> numScoresPerSkillType = new HashMap<>();
 	
-	private Map<String, Integer> numViolationsByType = new HashMap<String, Integer>();
+	private Map<String, Integer> numViolationsByType = new HashMap<>();
 	
 	int numScheduledScreenings = 0;
 	
 	public List<String> getAllEmails(String email){
 		List<Screener> screenerList = screenerRepository.findAllByEmailContainingIgnoreCase(email);
-		//System.out.println(screenerList.size());
 		List<String> emailList = new ArrayList<>();
 		for(Screener screener : screenerList) {
 				emailList.add(screener.getEmail());
@@ -78,7 +73,7 @@ public class ReportsService {
 
 		if (screener.getScreenings() == null) return null;
 		List<Screening> screenings = screener.getScreenings();
-		List<ScheduledScreening> scheduledScreenings = new ArrayList<ScheduledScreening>();
+		List<ScheduledScreening> scheduledScreenings = new ArrayList<>();
 		
 		if (screenings != null) {
 			for (Screening s : screenings) {
@@ -91,6 +86,7 @@ public class ReportsService {
 				if (softSkillViolationRepository.existsByScreeningId(s.getScreeningId())) {
 					SoftSkillViolation softSkillViolation = softSkillViolationRepository.getByScreeningId(s.getScreeningId());
 					softSkillViolations.add(softSkillViolation);
+					
 					if (softSkillViolation.hasViolationType())
 						violationTypes.add(softSkillViolation.getViolationType());
 				}
@@ -99,17 +95,13 @@ public class ReportsService {
 			}
 
 			Set<String> skillTypeTypes = bucketsBySkillType.keySet();
-			//System.out.println("SkillTypeTypes: " + skillTypeTypes + "\n");
 			for (String st : skillTypeTypes) {
 				List<Bucket> bl = bucketsBySkillType.get(st);
-				//System.out.println("BucketList: " + bl);
 				for (Bucket b : bl) {
 					String bucketKey = b.getBucketDescription();
-					//List<QuestionScore> questionScores = questionScoreRepository.findAllByBucketId(b.getBucketId());
 					for (Question q : b.getQuestions()) {
 						String questionText = q.getQuestionText();
 						for (QuestionScore qs : q.getQuestionScores()) {
-							//System.out.println("\n---- bucket" + b.getBucketId() + " has questionScores: " + qs);
 							Double value = qs.getScore();
 							if (value == null) break;
 							if (!scoresBySkillType.containsKey(st)) {
@@ -151,22 +143,10 @@ public class ReportsService {
 			}
 		}
 		
-		if (violationTypes != null) {
-			for (ViolationType v : violationTypes) {
-				String key = v.getViolationTypeText();
-				if (!numViolationsByType.containsKey(key)) {
-					numViolationsByType.put(key, 1);
-				} else if (numViolationsByType.containsKey(key)) {
-					numViolationsByType.put(key, numViolationsByType.get(key) + 1);
-				}
-			}
-		}
-		
-		ReportByEmailAndWeeksModel report = new ReportByEmailAndWeeksModel(
-				new Integer(screener.getScreenerId()),
+		return new ReportByEmailAndWeeksModel(
+				screener.getScreenerId(),
 				screener.getEmail(),
 				screener.getName());
-		return report;
 	}
 
 	public String getReport(String email, String weeks) {
@@ -190,31 +170,32 @@ public class ReportsService {
 				double scoreByDescription = scoresByDescription.get(key) / (double) numScoresPerDescription.get(key);
 				scoresByDescription.put(key, scoreByDescription);
 			}
-			//System.out.println("Description=" + key + "&Total Score=" + scoresByDescription.get(key));
 		}
 		
 		iter = scoresBySkillType.keySet().iterator();
 		while (iter.hasNext()) {
 			String key = iter.next();
-			//System.out.print("key=" + key + "&value=");
 			double scoreBySkillType = scoresBySkillType.get(key) / (double) numScoresPerSkillType.get(key);
-			//System.out.println(scoreBySkillType);
 			scoresBySkillType.put(key,  scoreBySkillType);
 		}
 		
 		iter = scoresByQuestion.keySet().iterator();
 		while (iter.hasNext()) {
 			String key = iter.next();
-			//System.out.print("questionText=" + key + "&value=");
 			double scoreByQuestion = scoresByQuestion.get(key) / (double) numScoresPerQuestion.get(key);
-			//System.out.println(scoreByQuestion);
 			scoresByQuestion.put(key,  scoreByQuestion);
 			questionKeys.add(key);
 		}
 		top5HardestQuestions = top5HardestSort(scoresByQuestion, questionKeys);
 		
-		//System.out.println(top5HardestQuestions);
-		//System.out.println("scoresByQuestion = " + scoresByQuestion);
+		for (ViolationType v : violationTypes) {
+			String key = v.getViolationTypeText();
+			if (!numViolationsByType.containsKey(key)) {
+				numViolationsByType.put(key, 1);
+			} else if (numViolationsByType.containsKey(key)) {
+				numViolationsByType.put(key, numViolationsByType.get(key) + 1);
+			}
+		}
 		
 		ReportByWeeksModel reportByWeeksModel = new ReportByWeeksModel(
 				reports, 
@@ -228,7 +209,10 @@ public class ReportsService {
 		return json;
 	}
 	
-	public TreeMap<String, Double> top5HardestSort(Map<String, Double> mapToSort, ArrayList<String> keys){
+	public TreeMap<String, Double> top5HardestSort(
+			Map<String, 
+			Double> mapToSort, 
+			ArrayList<String> keys){
 		
 		TreeMap<String, Double> sortedTreeMap = new TreeMap<>();
 		TreeSet<String> keysAndValues = new TreeSet<>();
