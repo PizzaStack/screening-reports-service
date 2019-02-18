@@ -9,7 +9,6 @@ public class ReportByEmailAndWeeksModel {
 	String email;
 	Map<String, Double> scoresBySkillType = new HashMap<String, Double>();
 	Map<String, Double> scoresByDescription = new HashMap<String, Double>();
-	Map<String, Double> scoresByQuestion = new TreeMap<String, Double>();
 	Map<String, Integer> numViolationsByType = new HashMap<String, Integer>();
 	int numScheduledScreenings;
 	
@@ -18,7 +17,6 @@ public class ReportByEmailAndWeeksModel {
 			String email,
 			Map<String, Double> scoresBySkillType,
 			Map<String, Double> scoresByDescription,
-			Map<String, Double> scoresByQuestion,
 			Map<String, Integer> numViolationsByType,
 			int numScheduledScreenings) {
 
@@ -26,7 +24,6 @@ public class ReportByEmailAndWeeksModel {
 		this.email = email;
 		this.scoresBySkillType = scoresBySkillType;
 		this.scoresByDescription = scoresByDescription;
-		this.scoresByQuestion = scoresByQuestion;
 		this.numScheduledScreenings = numScheduledScreenings;
 		this.numViolationsByType = numViolationsByType;
 	}

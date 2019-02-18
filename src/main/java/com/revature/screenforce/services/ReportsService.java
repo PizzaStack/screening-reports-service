@@ -45,6 +45,8 @@ public class ReportsService {
 	@Autowired SoftSkillViolationRepository softSkillViolationRepository;
 	@Autowired ViolationTypeRepository violationTypeRepository;
 	@Autowired WeightDAO weightDAO;
+	private Map<String, Double> scoresByQuestion = new HashMap<String, Double>();
+	private Map<String, Integer> numScoresPerQuestion = new HashMap<String, Integer>();
 
 	public List<String> getAllEmails(String email){
 		List<Screener> screenerList = screenerRepository.findAllByEmailContainingIgnoreCase(email);
@@ -56,7 +58,7 @@ public class ReportsService {
 		return emailList;
 	}
 	
-	public ReportByEmailAndWeeksModel  getJsonReportForEmailAndWeeks(String email, String weeks) {
+	public ReportByEmailAndWeeksModel getJsonReportForEmailAndWeeks(String email, String weeks) {
 		Screener screener = screenerRepository.getByEmail(email);
 
 		if (screener.getScreenings() == null) return null;
@@ -70,8 +72,6 @@ public class ReportsService {
 		Map<String, Integer> numScoresPerDescription = new HashMap<String, Integer>();
 		Map<String, Double> scoresBySkillType = new HashMap<String, Double>();
 		Map<String, Integer> numScoresPerSkillType = new HashMap<String, Integer>();
-		Map<String, Double> scoresByQuestion = new HashMap<String, Double>();
-		Map<String, Integer> numScoresPerQuestion = new HashMap<String, Integer>();
 		
 		Map<String, Integer> numViolationsByType = new HashMap<String, Integer>();
 		
@@ -163,15 +163,6 @@ public class ReportsService {
 				scoresBySkillType.put(key,  scoreBySkillType);
 			}
 			
-			iter = scoresByQuestion.keySet().iterator();
-			while (iter.hasNext()) {
-				String key = iter.next();
-				//System.out.print("questionText=" + key + "&value=");
-				double scoreByQuestion = scoresByQuestion.get(key) / (double) numScoresPerQuestion.get(key);
-				//System.out.println(scoreByQuestion);
-				scoresByQuestion.put(key,  scoreByQuestion);
-			}
-			
 			//System.out.println("scoresByQuestion = " + scoresByQuestion);
 		}
 		
@@ -192,7 +183,6 @@ public class ReportsService {
 				screener.getEmail(),
 				scoresBySkillType, 
 				scoresByDescription,
-				scoresByQuestion,
 				numViolationsByType, 
 				numScheduledScreenings);
 		return report;
@@ -209,7 +199,17 @@ public class ReportsService {
 		} else {
 			reports.add(getJsonReportForEmailAndWeeks(email, weeks));
 		}
-		ReportByWeeksModel reportByWeeksModel = new ReportByWeeksModel(reports);
+		
+		Iterator<String> iter = scoresByQuestion.keySet().iterator();
+		while (iter.hasNext()) {
+			String key = iter.next();
+			//System.out.print("questionText=" + key + "&value=");
+			double scoreByQuestion = scoresByQuestion.get(key) / (double) numScoresPerQuestion.get(key);
+			//System.out.println(scoreByQuestion);
+			scoresByQuestion.put(key,  scoreByQuestion);
+		}
+		
+		ReportByWeeksModel reportByWeeksModel = new ReportByWeeksModel(reports, scoresByQuestion);
 		Gson gson = new Gson();
 		String json = gson.toJson(reportByWeeksModel);
 		return json;
