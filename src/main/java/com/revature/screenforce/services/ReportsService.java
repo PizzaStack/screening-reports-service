@@ -75,6 +75,9 @@ public class ReportsService {
 		
 		Map<String, Integer> numViolationsByType = new HashMap<String, Integer>();
 		
+		Map<String, Double> top5HardestQuestions = new TreeMap<>();
+		ArrayList<String> questionKeys = new ArrayList<>();
+		
 		if (screenings != null) {
 			for (Screening s : screenings) {
 				ScheduledScreening ss = s.getScheduledScreening();
@@ -170,8 +173,12 @@ public class ReportsService {
 				double scoreByQuestion = scoresByQuestion.get(key) / (double) numScoresPerQuestion.get(key);
 				//System.out.println(scoreByQuestion);
 				scoresByQuestion.put(key,  scoreByQuestion);
+				questionKeys.add(key);
 			}
 			
+			top5HardestQuestions = top5HardestSort(scoresByQuestion, questionKeys);
+			
+			//System.out.println(top5HardestQuestions);
 			//System.out.println("scoresByQuestion = " + scoresByQuestion);
 		}
 		
@@ -192,7 +199,7 @@ public class ReportsService {
 				screener.getEmail(),
 				scoresBySkillType, 
 				scoresByDescription,
-				scoresByQuestion,
+				top5HardestQuestions,
 				numViolationsByType, 
 				numScheduledScreenings);
 		return report;
@@ -213,6 +220,28 @@ public class ReportsService {
 		Gson gson = new Gson();
 		String json = gson.toJson(reportByWeeksModel);
 		return json;
+	}
+	
+	public TreeMap<String, Double> top5HardestSort(Map<String, Double> mapToSort, ArrayList<String> keys){
+		TreeMap<String, Double> sortedTreeMap = new TreeMap<>();
+		TreeSet<String> keysAndValues = new TreeSet<>();
+		
+		for(String key : keys) {
+			keysAndValues.add(String.valueOf(mapToSort.get(key)) + ";" + key);
+		}
+		
+		int count = 1;
+		
+		for(String keyAndValue : keysAndValues) {
+			if(count < 6) {
+				String key = keyAndValue.substring(keyAndValue.indexOf(";") + 1, keyAndValue.length());
+				Double value = Double.parseDouble(keyAndValue.substring(0, keyAndValue.indexOf(";")));
+				sortedTreeMap.put(String.valueOf(count) + ". " + key, value);
+			}
+			count++;
+		}
+		
+		return sortedTreeMap;
 	}
 }
 
